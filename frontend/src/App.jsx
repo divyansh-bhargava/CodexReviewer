@@ -6,10 +6,13 @@ import Markdown from 'react-markdown'
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css"
 import './App.css'
+import Btn from './Btn'
+import Loader from './Loader'
 
 function App() {
   const [code, setCode] = useState("")
   const [output, setOutput] = useState("***Output will be displayed here***")
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     prism.highlightAll()
@@ -17,6 +20,7 @@ function App() {
 
   async function review() {
     console.log("hy hy");
+    setLoading(true)
     try {
       const res = await fetch('http://localhost:4000/api/v1/ai/get-response', {
         method: 'POST',
@@ -29,6 +33,9 @@ function App() {
       setOutput(data.data)
     } catch (error) {
       console.log(error)
+    }
+    finally{
+      setLoading(false)
     }
   }
 
@@ -51,13 +58,11 @@ function App() {
               }}
             />
           <div className='btn' onClick={review}>
-            REVIEW
+            <Btn text={"Review"}/>
           </div>
         </div>
         <div className="right">
-          <Markdown
-           rehypePlugins={[rehypeHighlight]}
-          >{output}</Markdown>
+              {loading ? <Loader /> : <Markdown rehypePlugins={[rehypeHighlight]} children={output} />}
         </div>
       </div>
     </>
